@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QCM - Le Kit de Survie Numérique du Collégien</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --card-bg: #1E1E1E;
+            --card-hover: #262626;
+            --text-color: #E0E0E0;
+            --text-muted: #9E9E9E;
+            --accent-color: #DEFF9A;
+            --accent-hover: #c9f578;
+            --correct-color: #4EAE67;
+            --correct-bg: rgba(78, 174, 103, 0.15);
+            --wrong-color: #FF6B6B;
+            --wrong-bg: rgba(255, 107, 107, 0.15);
+            --border-color: #2F2F2F;
+            --border-radius: 14px;
+            --font-stack: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-stack);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+            line-height: 1.5;
+        }
+
+        .quiz-wrapper {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6);
+            width: 100%;
+            max-width: 780px;
+            padding: 28px;
+            position: relative;
+        }
+
+        /* En-tête */
+        .quiz-header {
+            margin-bottom: 22px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 18px;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .tag-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background-color: rgba(222, 255, 154, 0.12);
+            color: var(--accent-color);
+            border: 1px solid rgba(222, 255, 154, 0.25);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .score-pill {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            background-color: #121212;
+            padding: 4px 12px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        h1 {
+            font-size: 1.55rem;
+            color: #FFFFFF;
+            font-weight: 700;
+        }
+
+        /* Progression */
+        .progress-section {
+            margin-top: 14px;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .progress-track {
+            width: 100%;
+            height: 8px;
+            background-color: #121212;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #A8E85A, var(--accent-color));
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 6px;
+        }
+
+        /* Questions */
+        .question-card {
+            margin: 20px 0;
+        }
+
+        .question-number {
+            font-size: 0.85rem;
+            color: var(--accent-color);
+            font-weight: 700;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+
+        .question-title {
+            font-size: 1.18rem;
+            color: #FFFFFF;
+            font-weight: 600;
+            margin-bottom: 18px;
+            line-height: 1.4;
+        }
+
+        /* Réponses */
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .option-button {
+            background-color: #232323;
+            border: 1.5px solid #333333;
+            border-radius: 10px;
+            color: var(--text-color);
+            padding: 14px 16px;
+            font-size: 0.98rem;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            font-family: inherit;
+        }
+
+        .option-button:hover:not(:disabled) {
+            background-color: var(--card-hover);
+            border-color: var(--accent-color);
+            transform: translateX(4px);
+        }
+
+        .option-button:disabled {
+            cursor: default;
+        }
+
+        .option-button.correct {
+            background-color: var(--correct-bg);
+            border-color: var(--correct-color);
+            color: #FFFFFF;
+            font-weight: 600;
+        }
+
+        .option-button.correct::after {
+            content: "✓";
+            color: var(--correct-color);
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .option-button.wrong {
+            background-color: var(--wrong-bg);
+            border-color: var(--wrong-color);
+            color: #FFFFFF;
+        }
+
+        .option-button.wrong::after {
+            content: "✕";
+            color: var(--wrong-color);
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .option-button.dimmed {
+            opacity: 0.45;
+        }
+
+        /* Feedback */
+        .feedback-container {
+            margin-top: 18px;
+            padding: 14px 16px;
+            border-radius: 8px;
+            display: none;
+            animation: fadeIn 0.25s ease;
+        }
+
+        .feedback-container.correct {
+            background-color: var(--correct-bg);
+            border-left: 4px solid var(--correct-color);
+        }
+
+        .feedback-container.wrong {
+            background-color: var(--wrong-bg);
+            border-left: 4px solid var(--wrong-color);
+        }
+
+        .feedback-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .feedback-container.correct .feedback-title {
+            color: var(--correct-color);
+        }
+
+        .feedback-container.wrong .feedback-title {
+            color: var(--wrong-color);
+        }
+
+        .feedback-text {
+            font-size: 0.9rem;
+            color: var(--text-color);
+            line-height: 1.45;
+        }
+
+        /* Actions */
+        .actions-row {
+            margin-top: 22px;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .btn-action {
+            background-color: var(--accent-color);
+            color: #121212;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 24px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        .btn-action:hover:not(:disabled) {
+            background-color: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 14px rgba(222, 255, 154, 0.25);
+        }
+
+        .btn-action:disabled {
+            background-color: #2D2D2D;
+            color: #666666;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Écran des résultats */
+        .results-view {
+            text-align: center;
+            padding: 10px 0;
+            display: none;
+            animation: fadeIn 0.35s ease;
+        }
+
+        .score-circle-wrapper {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 20px auto;
+            border-radius: 50%;
+            background: #171717;
+            border: 4px solid var(--accent-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 24px rgba(222, 255, 154, 0.15);
+        }
+
+        .score-val {
+            font-size: 2.6rem;
+            font-weight: 800;
+            color: var(--accent-color);
+            line-height: 1;
+        }
+
+        .score-sub {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-top: 4px;
+        }
+
+        .results-view h2 {
+            font-size: 1.5rem;
+            color: #FFFFFF;
+            margin-bottom: 10px;
+        }
+
+        .result-description {
+            font-size: 0.98rem;
+            color: var(--text-color);
+            max-width: 580px;
+            margin: 0 auto 24px auto;
+            line-height: 1.5;
+        }
+
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            max-width: 360px;
+            margin: 0 auto 24px auto;
+        }
+
+        .stat-box {
+            background-color: #151515;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 12px;
+        }
+
+        .stat-num {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .stat-num.succ { color: var(--correct-color); }
+        .stat-num.err { color: var(--wrong-color); }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 600px) {
+            .quiz-wrapper {
+                padding: 18px;
+            }
+            h1 {
+                font-size: 1.3rem;
+            }
+            .question-title {
+                font-size: 1.05rem;
+            }
+            .option-button {
+                padding: 12px 14px;
+                font-size: 0.9rem;
+            }
+            .score-circle-wrapper {
+                width: 130px;
+                height: 130px;
+            }
+            .score-val {
+                font-size: 2.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="quiz-wrapper">
+        <!-- VUE DU QUESTIONNAIRE -->
+        <div id="quiz-view">
+            <div class="quiz-header">
+                <div class="header-top">
+                    <span class="tag-badge">🛠️ Kit de Survie Numérique</span>
+                    <span class="score-pill" id="live-score">Score : 0 / 40</span>
+                </div>
+                <h1>Maîtriser, adapter et partager ses documents</h1>
+                <div class="progress-section">
+                    <div class="progress-info">
+                        <span>Progression</span>
+                        <span id="progress-text">Question 1 sur 40</span>
+                    </div>
+                    <div class="progress-track">
+                        <div class="progress-bar" id="progress-bar"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="question-card">
+                <div class="question-number" id="question-index-label">Question 1</div>
+                <div class="question-title" id="question-text">Chargement de la question...</div>
+                <div class="options-list" id="options-container"></div>
+            </div>
+
+            <div class="feedback-container" id="feedback-box">
+                <div class="feedback-title" id="feedback-title">Bonne réponse !</div>
+                <div class="feedback-text" id="feedback-desc">Explication pédagogique...</div>
+            </div>
+
+            <div class="actions-row">
+                <button class="btn-action" id="next-btn" disabled>Question suivante ➔</button>
+            </div>
+        </div>
+
+        <!-- VUE DES RÉSULTATS -->
+        <div class="results-view" id="results-view">
+            <span class="tag-badge" style="margin-bottom: 14px;">Bilan du Kit Numérique</span>
+            
+            <div class="score-circle-wrapper">
+                <div class="score-val" id="final-percent">0%</div>
+                <div class="score-sub">Score Final</div>
+            </div>
+
+            <h2 id="result-title-text">Niveau d'Expertise</h2>
+            <p class="result-description" id="result-desc-text">Commentaire d'évaluation...</p>
+
+            <div class="summary-stats">
+                <div class="stat-box">
+                    <div class="stat-num succ" id="stat-correct-count">0</div>
+                    <div class="stat-label">Réponses correctes</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-num err" id="stat-wrong-count">0</div>
+                    <div class="stat-label">Erreurs / Pièges</div>
+                </div>
+            </div>
+
+            <button class="btn-action" onclick="restartQuiz()">🔄 Recommencer l'évaluation</button>
+        </div>
+    </div>
+
+    <script>
+        const rawQuestions = [
+            // Slide 2 : Un document, plusieurs missions !
+            {
+                q: "Pourquoi est-il indispensable d'adapter le format et la présentation de ses fichiers au collège ?",
+                options: [
+                    "Parce qu'un exposé ne se comporte pas de la même façon sur papier, en vidéo-projection ou sur l'ENT",
+                    "Parce que tous les ordinateurs utilisent uniquement le format MP3",
+                    "Pour rendre le fichier invisible aux yeux du professeur",
+                    "Parce que les fichiers changent de langue automatiquement"
+                ],
+                answer: 0,
+                feedback: "Un même travail doit être adapté selon sa destination : lecture sur papier, projection collective en classe ou envoi numérique."
+            },
+            {
+                q: "Quels sont les 3 canaux de diffusion majeurs d'un document présentés dans le cours ?",
+                options: [
+                    "Sur papier (impression), en vidéo-projection (classe) et sur le Web / ENT (Pronote)",
+                    "Sur disquette, sur cassette et sur CD-ROM",
+                    "Par SMS, par appel téléphonique et par courrier postal",
+                    "Sur calculatrice, sur montre connectée et sur console de jeu"
+                ],
+                answer: 0,
+                feedback: "Les trois grandes voies sont : le papier (proche), la vidéo-projection (loin/oral) et l'ENT (transmission en ligne)."
+            },
+
+            // Slide 3 : Partie 1 : À chaque besoin, sa présentation
+            {
+                q: "Quel est l'usage principal d'un document au format « Sur papier » ?",
+                options: [
+                    "Pour lire de près, écrire des notes ou distribuer des fiches",
+                    "Pour diffuser une vidéo animée avec du son",
+                    "Pour projeter des textes à 10 mètres de distance",
+                    "Pour envoyer un devoir en pièce jointe automatique"
+                ],
+                answer: 0,
+                feedback: "Le support papier est idéal pour une lecture rapprochée et l'annotation manuscrite."
+            },
+            {
+                q: "À quoi est destinée la présentation en « Vidéo-projection » (TICE) ?",
+                options: [
+                    "À présenter un travail devant toute la classe réunie",
+                    "À imprimer 30 exemplaires pour les distribuer",
+                    "À rédiger un texte très dense en petits caractères",
+                    "À stocker des mots de passe personnels"
+                ],
+                answer: 0,
+                feedback: "La vidéo-projection sert d'appui visuel à une prise de parole face à un groupe d'élèves."
+            },
+            {
+                q: "Quel est l'objectif principal de la diffusion « Sur le Web / ENT » ?",
+                options: [
+                    "Transmettre son devoir propre et figé au professeur sur Pronote",
+                    "Afficher son travail sur le tableau blanc avec un feutre",
+                    "Supprimer définitivement la copie de l'ordinateur",
+                    "Empêcher le professeur d'évaluer le travail"
+                ],
+                answer: 0,
+                feedback: "L'ENT permet le dépôt officiel, sécurisé et dématérialisé des travaux scolaires."
+            },
+
+            // Slide 4 : Le Grand Match : Impression vs Projection
+            {
+                q: "Quelle orientation de page choisit-on pour un document destiné à l'Impression papier ?",
+                options: [
+                    "Le Mode Portrait (vertical)",
+                    "Le Mode Paysage (horizontal 16/9)",
+                    "Le Mode Diagonale",
+                    "Le Mode Panoramique 360°"
+                ],
+                answer: 0,
+                feedback: "L'impression papier standard privilégie l'orientation verticale (Portrait, format A4 classique)."
+            },
+            {
+                q: "Quelle orientation de page adopte-t-on pour un support de Projection ?",
+                options: [
+                    "Le Mode Paysage (horizontal 16/9)",
+                    "Le Mode Portrait (vertical)",
+                    "Le Mode Carré minuscule",
+                    "Le Mode Recto-Verso inversé"
+                ],
+                answer: 0,
+                feedback: "Les écrans et vidéoprojecteurs sont au format panoramique horizontal (16/9 Paysage)."
+            },
+            {
+                q: "Concernant la taille du texte, que permet le document imprimé par rapport à la projection ?",
+                options: [
+                    "Des textes plus denses et petits sont autorisés car la lecture se fait de près",
+                    "Il est obligatoire d'écrire en police taille 50",
+                    "On ne peut pas écrire de phrases complètes",
+                    "Seules les majuscules sont autorisées"
+                ],
+                answer: 0,
+                feedback: "La lecture de près sur papier tolère des caractères de taille standard (11-12 pt) et des paragraphes rédigés."
+            },
+            {
+                q: "Pour une Projection réussie, quel type de typographie et de taille doit-on utiliser ?",
+                options: [
+                    "Des textes énormes et des titres géants pour une lecture aisée de loin",
+                    "Un texte minuscule de 8 pt pour tout faire tenir sur une seule page",
+                    "Des paragraphes de 40 lignes sans sauter d'espace",
+                    "Une police invisible sur fond blanc"
+                ],
+                answer: 0,
+                feedback: "Pour être lu du fond de la classe, le texte projeté doit être très grand et épuré."
+            },
+            {
+                q: "Comment économise-t-on l'encre lors de l'Impression d'un document ?",
+                options: [
+                    "En conservant un fond blanc et en évitant les aplats de couleurs sombres",
+                    "En coloriant toute la page en noir",
+                    "En imprimant 10 fois le même document",
+                    "En utilisant des images floues"
+                ],
+                answer: 0,
+                feedback: "Un fond blanc standard préserve les cartouches d'encre et évite de mouiller excessivement le papier."
+            },
+            {
+                q: "Pourquoi les forts contrastes (ex: texte foncé sur fond très clair) sont-ils capitaux en Projection ?",
+                options: [
+                    "Pour garantir que le texte reste parfaitement lisible même avec la lumière de la classe",
+                    "Pour faire clignoter le vidéoprojecteur",
+                    "Pour user la lampe du projecteur",
+                    "Pour cacher les images"
+                ],
+                answer: 0,
+                feedback: "Un contraste net compense la luminosité ambiante de la salle de cours."
+            },
+
+            // Slide 5 : Focus : Les secrets d'une Impression réussie
+            {
+                q: "À quoi sert la fonction « Aperçu avant impression » ?",
+                options: [
+                    "À vérifier que le texte ne déborde pas sur une page vide ou inutile",
+                    "À changer automatiquement la langue du document",
+                    "À envoyer le texte par e-mail à toute la classe",
+                    "À corriger les fautes de calcul"
+                ],
+                answer: 0,
+                feedback: "L'aperçu évite le gaspillage en repérant les sauts de page involontaires et lignes isolées."
+            },
+            {
+                q: "Quel est le grand intérêt d'enregistrer en format PDF avant d'imprimer ou de rendre son devoir ?",
+                options: [
+                    "Il fige la mise en page pour qu'elle ne bouge plus quel que soit l'ordinateur",
+                    "Il supprime automatiquement les images trop lourdes",
+                    "Il permet à n'importe qui de modifier le texte",
+                    "Il transforme le texte en fichier son"
+                ],
+                answer: 0,
+                feedback: "Le PDF (Portable Document Format) verrouille polices, images et mise en page à l'identique."
+            },
+            {
+                q: "Quels sont les deux réflexes éco-responsables à appliquer lors d'une impression papier ?",
+                options: [
+                    "Penser au Noir & Blanc et à l'impression en Recto-Verso",
+                    "Imprimer en couleur fluo sur du papier cartonné",
+                    "Imprimer une seule ligne par feuille blanche",
+                    "Laisser l'imprimante allumée toute la nuit"
+                ],
+                answer: 0,
+                feedback: "Le recto-verso divise la consommation de papier par deux, et le noir et blanc économise les encres couleur."
+            },
+
+            // Slide 6 : Focus : Projeter comme un Pro
+            {
+                q: "Quelle taille minimale de police (Taille géante) est recommandée pour un diaporama projeté ?",
+                options: [
+                    "Police 24 pt minimum",
+                    "Police 8 pt",
+                    "Police 10 pt",
+                    "Police 14 pt maximum"
+                ],
+                answer: 0,
+                feedback: "Une taille d'au moins 24 points assure une lecture sans effort pour les élèves assis au fond de la salle."
+            },
+            {
+                q: "Que doit contenir une diapositive projetée au niveau du texte (« Mots-clés purs ») ?",
+                options: [
+                    "Pas de longs paragraphes, uniquement des repères et mots-clés",
+                    "L'intégralité du texte lu par l'élève mot à mot",
+                    "Un chapitre de livre complet sans espace",
+                    "Une liste de 50 phrases en petits caractères"
+                ],
+                answer: 0,
+                feedback: "Le support projeté donne des repères synthétiques : l'orateur apporte les explications à l'oral."
+            },
+            {
+                q: "Comment doivent être disposées les images sur un écran de projection (« Visuels XL ») ?",
+                options: [
+                    "De grandes images bien centrées et nettes",
+                    "15 images minuscules et floues entassées dans un coin",
+                    "Des images coupées en deux",
+                    "Des images invisibles derrière le texte"
+                ],
+                answer: 0,
+                feedback: "Un visuel grand et bien cadré capte l'œil et renforce immédiatement le message oral."
+            },
+
+            // Slide 7 : Le Fichier Parfait pour l'ENT (Pronote)
+            {
+                q: "Pourquoi est-il important d'avoir un « Poids Léger » pour un fichier déposé sur l'ENT ?",
+                options: [
+                    "Pour réduire la taille des images et ne pas dépasser la limite de taille imposée par l'ENT",
+                    "Pour que le fichier s'ouvre plus lentement",
+                    "Pour supprimer les devoirs des autres élèves",
+                    "Pour que le fichier devienne transparent"
+                ],
+                answer: 0,
+                feedback: "Les plateformes scolaires plafonnent la taille des pièces jointes : alléger les images permet de téléverser sans blocage."
+            },
+            {
+                q: "Pourquoi le « Format Ouvert » (comme le PDF ou format standard) est-il recommandé sur l'ENT ?",
+                options: [
+                    "Pour s'assurer que le professeur puisse ouvrir et lire le document sans problème technique",
+                    "Pour bloquer l'accès à la correction",
+                    "Pour empêcher l'impression du document",
+                    "Pour modifier les notes sur Pronote"
+                ],
+                answer: 0,
+                feedback: "Un format universel garantit la lisibilité sur tous les appareils de l'équipe pédagogique."
+            },
+            {
+                q: "Parmi ces propositions, quel est le « Nom Clair » idéal pour rendre un travail sur l'ENT ?",
+                options: [
+                    "Nom_Prenom_Expose.pdf",
+                    "document1.pdf",
+                    "sans_titre.docx",
+                    "truc.pdf"
+                ],
+                answer: 0,
+                feedback: "Indiquer Nom, Prénom et Sujet permet au professeur d'identifier le devoir instantanément."
+            },
+
+            // Slide 8 & 9 : Partie 2 : Les Formats et la Conversion & La Grande Famille des Fichiers
+            {
+                q: "Dans la famille des fichiers TEXTES, à quoi servent les formats `.docx` ou `.odt` ?",
+                options: [
+                    "À modifier, rédiger et retravailler le document dans un traitement de texte",
+                    "À verrouiller définitivement l'affichage",
+                    "À écouter de la musique",
+                    "À découper des vidéos"
+                ],
+                answer: 0,
+                feedback: "`.docx` et `.odt` sont des formats éditables de travail pour la saisie et la mise en page."
+            },
+            {
+                q: "Dans la famille des fichiers TEXTES, quel format utilise-t-on pour « figer l'affichage » de façon définitive ?",
+                options: [
+                    "Le format `.pdf`",
+                    "Le format `.mp3`",
+                    "Le format `.jpg`",
+                    "Le format `.odt`"
+                ],
+                answer: 0,
+                feedback: "Le format `.pdf` bloque la mise en page pour un rendu visuel universel non modifiable."
+            },
+            {
+                q: "Dans la famille des IMAGES, à quoi sert principalement le format `.jpg` (ou JPEG) ?",
+                options: [
+                    "Aux photographies classiques et images courantes",
+                    "Aux images avec un fond totalement transparent",
+                    "Aux fichiers audios enregistrés au micro",
+                    "Aux textes de plusieurs pages"
+                ],
+                answer: 0,
+                feedback: "Le `.jpg` est le standard de compression idéal pour les photographies."
+            },
+            {
+                q: "Quelle est la particularité exclusive du format d'image `.png` par rapport au `.jpg` ?",
+                options: [
+                    "Il gère les fonds transparents (très pratique pour détourer un logo ou un objet)",
+                    "Il contient des vidéos animées avec du son",
+                    "Il ne peut s'ouvrir que sur une télévision",
+                    "Il est interdit d'utilisation au collège"
+                ],
+                answer: 0,
+                feedback: "Le `.png` conserve la transparence d'arrière-plan pour incruster des objets sans rectangle blanc."
+            },
+            {
+                q: "Dans la famille AUDIO/VIDÉO, à quel type de contenu correspond l'extension `.mp3` ?",
+                options: [
+                    "Au son et à la musique",
+                    "Aux films et dessins animés",
+                    "Aux textes imprimés",
+                    "Aux diaporamas"
+                ],
+                answer: 0,
+                feedback: "Le `.mp3` est le format audio universel le plus répandu."
+            },
+            {
+                q: "Dans la famille AUDIO/VIDÉO, à quoi sert le format `.mp4` ?",
+                options: [
+                    "Aux films, vidéos et animations en mouvement",
+                    "Uniquement aux images fixes transparentes",
+                    "Aux documents textes de traitement de texte",
+                    "Aux feuilles de calculs mathématiques"
+                ],
+                answer: 0,
+                feedback: "Le `.mp4` est le format standard pour les vidéos numériques associant image animée et son."
+            },
+
+            // Slide 10 : Tutoriel Express : Convertir en 4 étapes
+            {
+                q: "Quelles sont les 4 étapes chronologiques pour convertir un document ?",
+                options: [
+                    "1. Ouvrir ➔ 2. Exporter ➔ 3. Choisir ➔ 4. Vérifier",
+                    "1. Supprimer ➔ 2. Renommer ➔ 3. Fermer ➔ 4. Imprimer",
+                    "1. Exporter ➔ 2. Vérifier ➔ 3. Ouvrir ➔ 4. Choisir",
+                    "1. Télécharger ➔ 2. Effacer ➔ 3. Coller ➔ 4. Quitter"
+                ],
+                answer: 0,
+                feedback: "La conversion suit la séquence : Ouvrir le fichier ➔ Exporter / Enregistrer sous ➔ Choisir le format (PDF) ➔ Vérifier le résultat."
+            },
+            {
+                q: "Que fait-on lors de l'Étape 2 du tutoriel de conversion ?",
+                options: [
+                    "Cliquer sur le menu `Fichier > Exporter` ou `Enregistrer sous`",
+                    "Éteindre l'écran de l'ordinateur",
+                    "Couper le câble d'alimentation",
+                    "Taper son mot de passe ENT"
+                ],
+                answer: 0,
+                feedback: "La commande d'exportation se situe dans le menu Fichier de votre logiciel bureautique."
+            },
+            {
+                q: "Pourquoi l'Étape 4 « Vérifier » est-elle indispensable après une conversion ?",
+                options: [
+                    "Pour ouvrir le nouveau fichier et contrôler que le résultat visuel est parfait avant envoi",
+                    "Pour voir si l'ordinateur a changé de couleur",
+                    "Pour supprimer le document original",
+                    "Pour vérifier la date du jour"
+                ],
+                answer: 0,
+                feedback: "Il faut toujours ouvrir le fichier exporté pour s'assurer qu'aucun décalage n'est survenu."
+            },
+
+            // Slide 11 & 12 : Partie 3 : Droit d'Auteur et Licences & La Règle d'Or du Web
+            {
+                q: "Que stipule « La Règle d'Or du Web » concernant les œuvres en ligne ?",
+                options: [
+                    "Toute image, chanson ou texte appartient à la personne qui l'a créée",
+                    "Tout ce qui est sur Internet est gratuit et sans propriétaire",
+                    "On peut copier n'importe quel travail si on ne se fait pas prendre",
+                    "Les créations sur le Web n'ont aucune valeur légale"
+                ],
+                answer: 0,
+                feedback: "Chaque création originale est protégée : elle appartient juridiquement à son auteur."
+            },
+            {
+                q: "Si tu utilises l'image d'un artiste dans ton exposé, quelle est ton obligation absolue ?",
+                options: [
+                    "Écrire obligatoirement son nom et le site où tu l'as trouvée (citer la source)",
+                    "Effacer la signature de l'artiste",
+                    "Prétendre que tu as dessiné l'image toi-même",
+                    "Payer 100 euros à ton professeur"
+                ],
+                answer: 0,
+                feedback: "Le respect du droit d'auteur impose de créditer nommément l'artiste et la source."
+            },
+            {
+                q: "Est-il permis de recopier et diffuser une œuvre protégée sans autorisation ?",
+                options: [
+                    "Non, c'est strictement interdit par la loi (violation du droit d'auteur / plagiat)",
+                    "Oui, si on met la photo en noir et blanc",
+                    "Oui, si l'exposé est présenté le matin",
+                    "Oui, si l'image provient d'un réseau social"
+                ],
+                answer: 0,
+                feedback: "Recopier ou exploiter une œuvre sans accord ni licence est illégal."
+            },
+
+            // Slide 13 : Le Super-Pouvoir du Partage : Creative Commons
+            {
+                q: "Que sont les licences « Creative Commons » (CC) ?",
+                options: [
+                    "Des autorisations données directement par les auteurs pour réutiliser leurs œuvres facilement et légalement",
+                    "Des amendes données aux élèves qui copient sur Internet",
+                    "Des logiciels payants pour bloquer les ordinateurs",
+                    "Des virus informatiques qui attaquent les images"
+                ],
+                answer: 0,
+                feedback: "Les licences Creative Commons permettent aux créateurs de préciser comment réutiliser leurs œuvres librement."
+            },
+            {
+                q: "Quel est l'avantage des licences Creative Commons pour vos devoirs et exposés ?",
+                options: [
+                    "Elles permettent d'illustrer ses projets en toute légalité sans voler le travail des artistes",
+                    "Elles écrivent le texte de l'exposé à votre place",
+                    "Elles suppriment l'obligation de venir en classe",
+                    "Elles permettent d'avoir 20/20 automatiquement"
+                ],
+                answer: 0,
+                feedback: "Elles offrent un cadre juridique clair pour enrichir ses travaux scolaires en toute sécurité."
+            },
+
+            // Slide 14 : Décoder les Symboles Creative Commons
+            {
+                q: "Que signifie le symbole Creative Commons « BY » (Attribution) ?",
+                options: [
+                    "Tu dois obligatoirement mentionner le nom de l'auteur",
+                    "Interdit de modifier l'image",
+                    "Interdit d'utiliser l'image au collège",
+                    "Obligation de payer une taxe"
+                ],
+                answer: 0,
+                feedback: "Le sigle BY (icône de silhouette) impose de créditer obligatoirement le créateur de l'œuvre."
+            },
+            {
+                q: "Que signifie le symbole Creative Commons « NC » (Non Commercial) ?",
+                options: [
+                    "Interdit de gagner de l'argent ou de faire du commerce avec ce travail",
+                    "Interdit d'utiliser l'image sur ordinateur",
+                    "Réservé uniquement aux entreprises commerciales",
+                    "Obligation de vendre l'exposé"
+                ],
+                answer: 0,
+                feedback: "NC (icône de symbole monétaire barré) interdit toute exploitation commerciale de l'œuvre."
+            },
+            {
+                q: "Que signifie le symbole Creative Commons « SA » (Partage à l'identique / Share Alike) ?",
+                options: [
+                    "Tu dois partager ton propre travail dérivé sous la même licence que l'original",
+                    "Interdit de faire des copies d'écran",
+                    "Obligation de supprimer l'image après 24 heures",
+                    "Autorisation réservée aux adultes"
+                ],
+                answer: 0,
+                feedback: "SA (icône de flèche circulaire) impose de diffuser l'œuvre modifiée avec les mêmes droits et libertés."
+            },
+
+            // Slide 15 : Le Pense-Bête Ultime du Collégien
+            {
+                q: "Selon le Pense-Bête Ultime, quel est le format idéal pour un « Devoir à rendre sur l'ENT » et pourquoi ?",
+                options: [
+                    "`.PDF` car la mise en page reste totalement fixe pour le professeur",
+                    "`.MP3` pour que le texte soit chanté",
+                    "`.DOCX` pour que le professeur puisse modifier vos réponses",
+                    "`.PNG` sur 50 pages séparées"
+                ],
+                answer: 0,
+                feedback: "Le PDF garantit que le devoir s'affiche exactement comme vous l'avez conçu."
+            },
+            {
+                q: "Quel format est recommandé pour un « Travail de groupe en cours de création » ?",
+                options: [
+                    "`.DOCX` ou `.ODT` car chacun peut modifier et ajouter du texte",
+                    "`.PDF` car personne ne peut écrire dedans",
+                    "`.MP4` sans texte",
+                    "`.JPG` en basse résolution"
+                ],
+                answer: 0,
+                feedback: "Les formats modifiables (`.docx` / `.odt`) sont requis lors de la phase de rédaction collaborative."
+            },
+            {
+                q: "Quels formats utilise-t-on pour un « Exposé projeté en classe » ?",
+                options: [
+                    "`.PDF` ou `.PPTX` pour un affichage parfait sur grand écran",
+                    "`.TXT` sans mise en forme",
+                    "`.MP3` sans aucune image",
+                    "`.ZIP` sans le décompresser"
+                ],
+                answer: 0,
+                feedback: "`.PPTX` (diaporama) ou `.PDF` plein écran assurent une projection fluide et nette."
+            },
+            {
+                q: "Quels formats d'image universels doit-on privilégier pour insérer une illustration ?",
+                options: [
+                    "`.PNG` ou `.JPG` lisibles partout sur tous les appareils",
+                    "`.EXE` ou `.BAT`",
+                    "`.HTML` uniquement",
+                    "Des fichiers sans extension"
+                ],
+                answer: 0,
+                feedback: "`.JPG` et `.PNG` sont les standards universels de l'image numérique."
+            },
+
+            // Slide 16 : Les 3 Règles d'Or
+            {
+                q: "Quelle est la 1ère Règle d'Or du Kit de Survie Numérique ?",
+                options: [
+                    "Adapte toujours le format à ta destination (PDF pour rendre, DOCX pour créer)",
+                    "Utilise toujours le format MP3 pour tes textes",
+                    "Envoie tes devoirs sans les relire",
+                    "Supprime tous tes fichiers après les cours"
+                ],
+                answer: 0,
+                feedback: "Règle 1 : Choisir le bon format en fonction de l'usage (création modifiable vs rendu finalisé)."
+            },
+            {
+                q: "Que stipule la 2ème Règle d'Or concernant la « Lisibilité » ?",
+                options: [
+                    "Vérifie ta lisibilité : contrastes nets et taille de texte adaptée au support",
+                    "Écris en jaune pâle sur fond blanc",
+                    "Utilise une police de taille 6 sur grand écran",
+                    "Mets 20 couleurs différentes par page"
+                ],
+                answer: 0,
+                feedback: "Règle 2 : Assurer une lisibilité parfaite (contraste, taille et aération)."
+            },
+            {
+                q: "Que commande la 3ème Règle d'Or pour être un collégien numérique responsable ?",
+                options: [
+                    "Cite tes sources et respecte les créateurs !",
+                    "Copie tout ce que tu trouves sans rien dire",
+                    "Télécharge des images sans vérifier les droits",
+                    "Donne ton mot de passe Pronote à tes camarades"
+                ],
+                answer: 0,
+                feedback: "Règle 3 : Respecter la propriété intellectuelle en citant systématiquement ses sources !"
+            }
+        ];
+
+        let questions = [];
+        let currentIndex = 0;
+        let score = 0;
+        let isAnswered = false;
+
+        const quizView = document.getElementById('quiz-view');
+        const resultsView = document.getElementById('results-view');
+        const questionText = document.getElementById('question-text');
+        const questionIndexLabel = document.getElementById('question-index-label');
+        const optionsContainer = document.getElementById('options-container');
+        const progressBar = document.getElementById('progress-bar');
+        const progressText = document.getElementById('progress-text');
+        const liveScore = document.getElementById('live-score');
+        const feedbackBox = document.getElementById('feedback-box');
+        const feedbackTitle = document.getElementById('feedback-title');
+        const feedbackDesc = document.getElementById('feedback-desc');
+        const nextBtn = document.getElementById('next-btn');
+
+        function shuffleArray(arr) {
+            const copy = [...arr];
+            for (let i = copy.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [copy[i], copy[j]] = [copy[j], copy[i]];
+            }
+            return copy;
+        }
+
+        function initQuiz() {
+            questions = shuffleArray(rawQuestions).map(q => {
+                const mappedOptions = q.options.map((optText, originalIndex) => ({
+                    text: optText,
+                    isCorrect: originalIndex === q.answer
+                }));
+                return {
+                    q: q.q,
+                    options: shuffleArray(mappedOptions),
+                    feedback: q.feedback
+                };
+            });
+
+            currentIndex = 0;
+            score = 0;
+            isAnswered = false;
+
+            quizView.style.display = 'block';
+            resultsView.style.display = 'none';
+            liveScore.innerText = `Score : 0 / ${questions.length}`;
+
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            isAnswered = false;
+            nextBtn.disabled = true;
+            feedbackBox.style.display = 'none';
+
+            const total = questions.length;
+            const currentNum = currentIndex + 1;
+            const qData = questions[currentIndex];
+
+            progressText.innerText = `Question ${currentNum} sur ${total}`;
+            questionIndexLabel.innerText = `Question ${currentNum} / ${total}`;
+            progressBar.style.width = `${(currentNum / total) * 100}%`;
+
+            questionText.innerText = qData.q;
+
+            optionsContainer.innerHTML = '';
+            qData.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-button';
+                btn.innerText = opt.text;
+                btn.onclick = () => handleSelectOption(idx, opt.isCorrect);
+                optionsContainer.appendChild(btn);
+            });
+
+            if (currentIndex === total - 1) {
+                nextBtn.innerText = "Consulter le Bilan du Kit ➔";
+            } else {
+                nextBtn.innerText = "Question suivante ➔";
+            }
+        }
+
+        function handleSelectOption(selectedIdx, isCorrect) {
+            if (isAnswered) return;
+            isAnswered = true;
+
+            const buttons = optionsContainer.querySelectorAll('.option-button');
+            const qData = questions[currentIndex];
+
+            buttons.forEach((btn, idx) => {
+                btn.disabled = true;
+                if (qData.options[idx].isCorrect) {
+                    btn.classList.add('correct');
+                } else if (idx === selectedIdx) {
+                    btn.classList.add('wrong');
+                } else {
+                    btn.classList.add('dimmed');
+                }
+            });
+
+            if (isCorrect) {
+                score++;
+                feedbackBox.className = 'feedback-container correct';
+                feedbackTitle.innerText = "✓ Bonne réponse !";
+            } else {
+                feedbackBox.className = 'feedback-container wrong';
+                feedbackTitle.innerText = "✕ Mauvaise réponse !";
+            }
+
+            liveScore.innerText = `Score : ${score} / ${questions.length}`;
+            feedbackDesc.innerText = qData.feedback;
+            feedbackBox.style.display = 'block';
+
+            nextBtn.disabled = false;
+        }
+
+        nextBtn.addEventListener('click', () => {
+            if (currentIndex < questions.length - 1) {
+                currentIndex++;
+                renderQuestion();
+            } else {
+                showResults();
+            }
+        });
+
+        function showResults() {
+            quizView.style.display = 'none';
+            resultsView.style.display = 'block';
+
+            const total = questions.length;
+            const percent = Math.round((score / total) * 100);
+
+            document.getElementById('final-percent').innerText = `${percent}%`;
+            document.getElementById('stat-correct-count').innerText = score;
+            document.getElementById('stat-wrong-count').innerText = total - score;
+
+            const titleEl = document.getElementById('result-title-text');
+            const descEl = document.getElementById('result-desc-text');
+
+            if (percent >= 90) {
+                titleEl.innerText = "🏆 Grand Maître du Numérique Collège !";
+                descEl.innerText = "Félicitations ! Tu maîtrises parfaitement l'adaptation des formats (papier, projection, ENT), les règles d'impression éco-responsable, les extensions de fichiers (DOCX, PDF, PNG, JPG, MP3, MP4), le tutoriel de conversion et les licences Creative Commons (BY, NC, SA). Tes documents sont dignes d'un vrai professionnel !";
+            } else if (percent >= 75) {
+                titleEl.innerText = "⭐ Collégien Numérique Confirmé !";
+                descEl.innerText = "Très bon travail ! Tu as acquis d'excellents réflexes pour choisir le bon format au bon moment, figer tes documents en PDF et respecter le travail des créateurs.";
+            } else if (percent >= 50) {
+                titleEl.innerText = "📁 Apprenti en Bureautique";
+                descEl.innerText = "Des bases acquises, mais attention aux pièges : revois la différence entre DOCX et PDF, la transparence du PNG, les symboles Creative Commons et les règles de projection en classe.";
+            } else {
+                titleEl.innerText = "⚠️ Kit de Survie à Relire";
+                descEl.innerText = "Attention aux erreurs de formats et aux règles de partage ! Relis attentivement les diapositives du cours, mémorise les 3 règles d'or et le pense-bête ultime, puis retente l'évaluation.";
+            }
+        }
+
+        function restartQuiz() {
+            initQuiz();
+        }
+
+        window.addEventListener('DOMContentLoaded', initQuiz);
+    </script>
+</body>
+</html>
